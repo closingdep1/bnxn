@@ -1,6 +1,6 @@
 // server.js
 const express = require('express');
-const axios = require('axios'); // Or use native fetch in Node 18+
+const axios = require('axios');
 const path = require('path');
 
 const app = express();
@@ -8,55 +8,87 @@ const PORT = process.env.PORT || 10000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
-// Serve the static HTML file
+
+// Serve the static HTML file from the root directory
 app.use(express.static(__dirname));
 
-// The correct password (also move this to an env var for better security!)
+// The correct password (from environment variable)
 const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2027219";
 
+// API endpoint to handle password verification
 app.post('/api/unlock', async (req, res) => {
-  const { password, userAgent, referrer } = req.body;
+  try {
+    const { password, userAgent, referrer } = req.body;
 
-  if (password === CORRECT_CODE) {
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    console.log('Received unlock request. Password provided:', !!password);
 
-    if (!token || !chatId) {
-      console.error("Missing Telegram environment variables");
-      return res.status(500).json({ error: "Server configuration error" });
-    }
+    if (password === CORRECT_CODE) {
+      const token = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
 
-    const now = new Date().toLocaleString('en-US', { 
-      timeZone: 'America/New_York',
-      year: 'numeric', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
-    });
+      if (!token || !chatId) {
+        console.error("Missing Telegram environment variables");
+        return res.status(500).json({ 
+          success: false, 
+          error: "Server configuration error" 
+        });
+      }
 
-    const message = 
-      `🔓 *SUCCESSFUL UNLOCK* 🔓\n` +
-      `📄 Document: Project-TH2027.pdf\n` +
-      `🕒 Time: ${now}\n` +
-      `🌐 User Agent: ${userAgent || 'unknown'}\n` +
-      `🔗 Referrer: ${referrer || 'direct'}\n` +
-      `✅ Password Used: ${password}\n` +
-      `👤 Client accessed the document.`;
-
-    try {
-      await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'Markdown'
+      const now = new Date().toLocaleString('en-US', { 
+        timeZone: 'America/New_York',
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit'
       });
-      
-      // Success: Tell the frontend to redirect
-      res.json({ success: true, redirectUrl: "https://project-th2027-5f1bc0.meridiancgca.workers.dev/?k=ihjUNoYT9Loq_u5yP_bxTCuI" });
-    } catch (error) {
-      console.error("Telegram API Error:", error.message);
-      res.status(500).json({ error: "Failed to process request" });
+
+      const message = 
+        `🔓 *SUCCESSFUL UNLOCK* \n` +
+        `📄 Document: Project-TH2027.pdf\n` +
+        `🕒 Time: ${now}\n` +
+        `🌐 User Agent: ${userAgent || 'unknown'}\n` +
+        `🔗 Referrer: ${referrer || 'direct'}\n` +
+        `✅ Password Used: ${password}\n` +
+        `👤 Client accessed the document.`;
+
+      try {
+        await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'Markdown'
+        });
+        
+        console.log('✅ Telegram notification sent successfully');
+        
+        // Success: Tell the frontend to redirect
+        res.json({ 
+          success: true, 
+          redirectUrl: "https://project-th2027-5f1bc0.meridiancgca.workers.dev/?k=ihjUNoYT9Loq_u5yP_bxTCuI" 
+        });
+      } catch (telegramError) {
+        console.error("Telegram API Error:", telegramError.message);
+        // Still allow access even if Telegram fails
+        res.json({ 
+          success: true, 
+          redirectUrl: "https://project-th2027-5f1bc0.meridiancgca.workers.dev/?k=ihjUNoYT9Loq_u5yP_bxTCuI" 
+        });
+      }
+    } else {
+      // Failure: Incorrect password
+      console.log('❌ Incorrect password attempt');
+      res.status(401).json({ 
+        success: false, 
+        error: "That password is incorrect. Try again." 
+      });
     }
-  } else {
-    // Failure: Incorrect password
-    res.status(401).json({ success: false, error: "That password is incorrect. Try again." });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Failed to process request" 
+    });
   }
 });
 
