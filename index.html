@@ -1,0 +1,59 @@
+<!-- Keep all your existing <head> and CSS exactly as they were -->
+<!-- ... -->
+
+<script>
+  (function() {
+    var form = document.getElementById("password-form");
+    var input = document.getElementById("document-password");
+    var error = document.getElementById("form-error");
+
+    if (input) {
+      input.focus();
+    }
+
+    if (form) {
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        var entered = input.value;
+        var submitButton = form.querySelector(".unlock-button");
+        
+        // Disable button while processing
+        submitButton.disabled = true;
+        submitButton.textContent = "Checking...";
+        error.textContent = "";
+
+        try {
+          // Send the password to your secure backend
+          const response = await fetch("/api/unlock", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              password: entered,
+              userAgent: navigator.userAgent,
+              referrer: document.referrer
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Redirect on success
+            window.location.replace(data.redirectUrl);
+          } else {
+            // Show error on failure
+            error.textContent = data.error || "That password is incorrect. Try again.";
+            input.select();
+          }
+        } catch (err) {
+          console.error("Network error:", err);
+          error.textContent = "A network error occurred. Please try again.";
+          input.select();
+        } finally {
+          // Re-enable button
+          submitButton.disabled = false;
+          submitButton.textContent = "Unlock document";
+        }
+      });
+    }
+  })();
+</script>
