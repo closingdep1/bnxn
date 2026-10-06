@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 10000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 // Serve the static HTML file
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 // The correct password (also move this to an env var for better security!)
 const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2027219";
