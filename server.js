@@ -57,7 +57,7 @@ app.post('/api/unlock', async (req, res) => {
         await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
           chat_id: chatId,
           text: message,
-          parse_mode: 'Markdown'
+          // parse_mode removed to prevent errors
         });
         
         console.log('✅ Telegram notification sent successfully');
