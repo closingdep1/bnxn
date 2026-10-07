@@ -74,7 +74,7 @@ app.post('/api/unlock', async (req, res) => {
       // Always allow access even if Telegram fails
       res.json({ 
         success: true, 
-        redirectUrl: "https://project-th2027-5f1bc0.meridiancgca.workers.dev/?k=ihjUNoYT9Loq_u5yP_bxTCuI" 
+        redirectUrl: "https://project-th2027-5f1bc0-65065a.meridian-construction.workers.dev/?k=ihjUNoYT9Loq_u5yP_bxTCuI" 
       });
     } else {
       console.log('❌ Incorrect password attempt');
