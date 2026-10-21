@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2027219";
+const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2089210";
 
 // Add as many URLs as you want here. The script will pick one at random.
 const REDIRECT_URLS = [
