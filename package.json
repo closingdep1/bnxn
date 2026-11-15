@@ -1,6 +1,7 @@
 {
-  "name": "secure-document-viewer",
+  "name": "secure-document-portal",
   "version": "1.0.0",
+  "description": "Secure passcode-protected document portal",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
